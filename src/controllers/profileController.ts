@@ -5,7 +5,7 @@ dotenv.config()
 import db from '../database/db'
 const SECRET_KEY = process.env.SECRET_KEY || 'test'
 
-// 1. GET: Получение данных о юзере из бд
+// 1. GET: Получение данных о юзере из бд.
 export const user_profile_data = async (req: Request, res: Response) => {
   const token = req.headers.authorization?.split(' ')[1]
 
