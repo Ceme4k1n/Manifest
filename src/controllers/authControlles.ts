@@ -3,7 +3,6 @@ const dotenv = require('dotenv')
 import jwt from 'jsonwebtoken'
 dotenv.config()
 import db from '../database/db'
-
 const SECRET_KEY = process.env.SECRET_KEY || 'test'
 
 // 1. POST: Авторизация пользователя
@@ -39,12 +38,13 @@ export const user_register = async (req: Request, res: Response) => {
       const user = await db.any('SELECT username FROM man.users WHERE username = $1', [username])
       if (user.length > 0) {
         res.status(502).json({ message: 'User exist', user })
-        console.log(user)
+        console.log('Юзер существует: ', user)
         return
       } else {
         await db.none('INSERT INTO man.users(username, password_hash, email) VALUES($1, $2, $3)', [username, password, username])
         const token = jwt.sign({ name: username }, SECRET_KEY, { expiresIn: '1h' })
         res.json({ message: `Рега успешная`, token })
+        console.log('Юзер создан', username)
       }
     } catch (error) {
       console.error(error)

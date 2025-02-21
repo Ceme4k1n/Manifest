@@ -10,7 +10,11 @@ document.addEventListener('DOMContentLoaded', function () {
     headers: { Authorization: `Bearer ${token}` },
   })
     .then((res) => res.json())
-    .then((data) => console.log('Protected data:', data))
+    .then((data) => {
+      if (token) {
+        window.location.href = '/profile.html'
+      }
+    })
     .catch((error) => console.error('Error:', error))
 })
 
@@ -32,7 +36,7 @@ document.getElementById('loginForm').addEventListener('submit', async function (
         if (data.token) {
           console.log(data.token)
           localStorage.setItem('Token', data.token)
-          window.location.href = '/base.html'
+          window.location.href = '/profile.html'
         }
       })
   } catch (error) {
@@ -67,6 +71,7 @@ document.getElementById('regForm').addEventListener('submit', async function (ev
         if (data) {
           console.log(data.token)
           localStorage.setItem('Token', data.token)
+          window.location.href = '/profile.html'
         }
       })
       .catch((error) => console.log('Error:', error))
