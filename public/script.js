@@ -1,7 +1,9 @@
-const logUsername = document.getElementById('username')
-const logPassword = document.getElementById('password')
+const logEmail = document.getElementById('log_email')
+const logPassword = document.getElementById('log_password')
+const regName = document.getElementById('reg_name')
+const regLastName = document.getElementById('reg_lastname')
+const regEmail = document.getElementById('reg_email')
 const regPassword = document.getElementById('reg_password')
-const regUsername = document.getElementById('reg_username')
 
 document.addEventListener('DOMContentLoaded', function () {
   token = localStorage.getItem('Token')
@@ -21,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function () {
 document.getElementById('loginForm').addEventListener('submit', async function (event) {
   event.preventDefault()
 
-  const username = logUsername.value
+  const email = logEmail.value
   const password = await hashPassword(logPassword.value)
   try {
     fetch('http://localhost:4000/auth/login', {
@@ -29,7 +31,7 @@ document.getElementById('loginForm').addEventListener('submit', async function (
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ email, password }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -47,9 +49,11 @@ document.getElementById('loginForm').addEventListener('submit', async function (
 document.getElementById('regForm').addEventListener('submit', async function (event) {
   event.preventDefault()
 
-  const username = regUsername.value
+  const name = regName.value
+  const lastName = regLastName.value
+  const email = regEmail.value
   const password = await hashPassword(regPassword.value) // Хешируем пароль
-  console.log(username, password)
+  console.log(name, password)
 
   try {
     fetch('http://localhost:4000/auth/reg', {
@@ -57,7 +61,7 @@ document.getElementById('regForm').addEventListener('submit', async function (ev
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ name, lastName, email, password }),
     })
       .then((response) => {
         console.log('Status: ', response.status)

@@ -7,10 +7,10 @@ const SECRET_KEY = process.env.SECRET_KEY || 'test'
 
 // 1. POST: Авторизация пользователя
 export const user_login = async (req: Request, res: Response) => {
-  const { username, password } = req.body
-  if (username && password) {
+  const { email, password } = req.body
+  if (email && password) {
     try {
-      const user = await db.any('SELECT username FROM man.users WHERE password_hash = $1 AND username = $2', [password, username])
+      const user = await db.any('SELECT username FROM man.users WHERE password_hash = $1 AND email = $2', [password, email])
       if (!user) {
         res.status(401).json({ message: 'Invalid credentials' })
         return
@@ -20,7 +20,7 @@ export const user_login = async (req: Request, res: Response) => {
         return
       }
 
-      const token = jwt.sign({ name: username }, SECRET_KEY, { expiresIn: '1h' })
+      const token = jwt.sign({ name: email }, SECRET_KEY, { expiresIn: '1h' })
 
       res.json({ message: 'Логин успешный', token })
       console.log(user)
@@ -32,19 +32,25 @@ export const user_login = async (req: Request, res: Response) => {
 }
 // 2. POST: Регистрация пользователя
 export const user_register = async (req: Request, res: Response) => {
-  const { username, password } = req.body
-  if (username && password) {
+  const { name, lastName, email, password } = req.body
+
+  if (name && lastName && email && password) {
     try {
-      const user = await db.any('SELECT username FROM man.users WHERE username = $1', [username])
+      const user = await db.any('SELECT username FROM man.users WHERE email = $1', [email])
       if (user.length > 0) {
         res.status(502).json({ message: 'User exist', user })
         console.log('Юзер существует: ', user)
         return
       } else {
-        await db.none('INSERT INTO man.users(username, password_hash, email) VALUES($1, $2, $3)', [username, password, username])
-        const token = jwt.sign({ name: username }, SECRET_KEY, { expiresIn: '1h' })
+        const fio: string = name + ' ' + lastName
+        let result = await db.one('SELECT MAX(id) FROM man.users')
+        const futureId = 'id_' + (result.max + 1)
+        console.log(futureId)
+
+        await db.none('INSERT INTO man.users(username, email, password_hash, fio) VALUES($1, $2, $3, $4)', [futureId, email, password, fio])
+        const token = jwt.sign({ email: email }, SECRET_KEY, { expiresIn: '1h' })
         res.json({ message: `Рега успешная`, token })
-        console.log('Юзер создан', username)
+        console.log('Юзер создан, с таким email: ', email)
       }
     } catch (error) {
       console.error(error)

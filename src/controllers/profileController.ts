@@ -20,8 +20,10 @@ export const user_profile_data = async (req: Request, res: Response) => {
       return
     }
     const userData = decoded as { name?: string }
+    console.log(decoded)
+
     try {
-      const user = await db.any('SELECT fio, bio FROM man.users WHERE username = $1', [userData.name])
+      const user = await db.any('SELECT fio, bio FROM man.users WHERE email = $1', [userData.name])
       res.json({ message: 'Protected data accessed!', user })
     } catch (error) {
       console.error(error)

@@ -11,11 +11,11 @@
       <div class="card">
         <h2>Авторизоваться</h2>
         <form id="loginForm">
-          <label for="username">Имя пользователя</label>
-          <input type="text" id="username" name="username" required />
+          <label for="username">Email</label>
+          <input type="text" id="log_email" name="username" required />
 
           <label for="password">Пароль</label>
-          <input type="password" id="password" name="password" required />
+          <input type="password" id="log_password" name="password" required />
 
           <button type="submit">Залогиниться</button>
         </form>
@@ -26,13 +26,19 @@
       <div class="card">
         <h2>Регистрация</h2>
         <form id="regForm">
-          <label for="username">Имя пользователя</label>
-          <input type="text" id="reg_username" name="username" required />
+          <label for="reg_name">Имя</label>
+          <input type="text" id="reg_name" name="name" required />
+
+          <label for="reg_lastname">Фамилия</label>
+          <input type="text" id="reg_lastname" name="lastname" required />
+
+          <label for="email">Email</label>
+          <input type="text" id="reg_email" name="email" required />
 
           <label for="password">Пароль</label>
           <input type="password" id="reg_password" name="password" required />
 
-          <button type="submit">Зарегаться</button>
+          <button type="submit">Зарегистрироваться</button>
         </form>
       </div>
     </div>
