@@ -14,11 +14,11 @@ document.addEventListener('DOMContentLoaded', function () {
     .catch((error) => console.error('Error:', error))
 })
 
-document.getElementById('loginForm').addEventListener('submit', function (event) {
+document.getElementById('loginForm').addEventListener('submit', async function (event) {
   event.preventDefault()
 
   const username = logUsername.value
-  const password = logPassword.value
+  const password = await hashPassword(logPassword.value)
   try {
     fetch('http://localhost:4000/auth/login', {
       method: 'POST',
@@ -29,9 +29,10 @@ document.getElementById('loginForm').addEventListener('submit', function (event)
     })
       .then((response) => response.json())
       .then((data) => {
-        if (data) {
+        if (data.token) {
           console.log(data.token)
           localStorage.setItem('Token', data.token)
+          window.location.href = '/base.html'
         }
       })
   } catch (error) {
@@ -39,11 +40,11 @@ document.getElementById('loginForm').addEventListener('submit', function (event)
   }
 })
 
-document.getElementById('regForm').addEventListener('submit', function (event) {
+document.getElementById('regForm').addEventListener('submit', async function (event) {
   event.preventDefault()
 
   const username = regUsername.value
-  const password = regPassword.value
+  const password = await hashPassword(regPassword.value) // Хешируем пароль
   console.log(username, password)
 
   try {
@@ -73,3 +74,15 @@ document.getElementById('regForm').addEventListener('submit', function (event) {
     console.log('Ошибка:', error)
   }
 })
+
+async function hashPassword(password) {
+  const encoder = new TextEncoder()
+  const data = encoder.encode(password)
+
+  const hash = await crypto.subtle.digest('SHA-256', data)
+
+  const hashArray = Array.from(new Uint8Array(hash))
+  const hashHex = hashArray.map((byte) => byte.toString(16).padStart(2, '0')).join('')
+
+  return hashHex
+}
