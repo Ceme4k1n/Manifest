@@ -6,14 +6,20 @@ const regEmail = document.getElementById('reg_email')
 const regPassword = document.getElementById('reg_password')
 
 document.addEventListener('DOMContentLoaded', function () {
-  token = localStorage.getItem('Token')
+  const token = localStorage.getItem('Token')
+
+  if (!token) {
+    return
+  }
   fetch('http://localhost:4000/auth/protect', {
     method: 'GET',
     headers: { Authorization: `Bearer ${token}` },
   })
     .then((res) => res.json())
     .then((data) => {
-      if (token) {
+      if (data.token) {
+        console.log(data.user)
+
         window.location.href = '/profile.html'
       }
     })
@@ -36,7 +42,7 @@ document.getElementById('loginForm').addEventListener('submit', async function (
       .then((response) => response.json())
       .then((data) => {
         if (data.token) {
-          console.log(data.token)
+          console.log('Токен: ', data.token)
           localStorage.setItem('Token', data.token)
           window.location.href = '/profile.html'
         }
