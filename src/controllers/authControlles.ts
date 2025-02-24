@@ -5,7 +5,6 @@ dotenv.config()
 import db from '../database/db'
 
 const SECRET_KEY = process.env.SECRET_KEY || 'test'
-const SECRET_SALT = process.env.SECTER_SATL || 'test'
 
 // 1. POST: Авторизация пользователя
 export const user_login = async (req: Request, res: Response) => {
