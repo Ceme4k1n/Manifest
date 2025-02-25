@@ -116,7 +116,6 @@ export const verefi_code = async (req: Request, res: Response) => {
     if (result.exists) {
       const tokenEmail = jwt.sign({ Email: decodeEmail, Code: code }, SECRET_KEY, { expiresIn: '10m' })
       res.status(200).json({ message: 'Email exist', tokenEmail })
-      res.status(200).json('True user')
     }
   } catch (error) {
     console.error(error)
@@ -125,11 +124,26 @@ export const verefi_code = async (req: Request, res: Response) => {
 }
 
 export const reset_password = async (req: Request, res: Response) => {
-  const { newPassword } = req.body
-  let decodeEmail
+  const { newPassword, emailToken } = req.body
+  let decodeEmail, decodeCode
 
-  console.log(newPassword)
+  if (!newPassword || !emailToken) {
+    res.status(402).json({ message: 'Token or pass not exist' })
+  }
 
+  jwt.verify(emailToken, SECRET_KEY, (err: any, decoded: any) => {
+    if (err) {
+      res.status(403).json({ message: 'Invalid token' })
+      return
+    }
+    decodeEmail = decoded.Email
+    decodeCode = decoded.Code
+  })
   try {
-  } catch (error) {}
+    await db.none('UPDATE man.users SET password_hash = $1, reset_code = NULL WHERE email = $2 AND reset_code = $3', [newPassword, decodeEmail, decodeCode])
+    res.status(200).json({ message: 'Got it' })
+  } catch (error) {
+    console.error(error)
+    res.status(501).json({ error: 'Database error' })
+  }
 }

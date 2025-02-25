@@ -178,7 +178,38 @@ async function verifyCode() {
         localStorage.setItem('Email_token', data.tokenEmail)
       })
       .catch((error) => console.error('Ошибка:', error))
-  } catch (error) {}
+  } catch (error) {
+    console.log('Ошибка:', error)
+  }
+}
+
+async function resetPassword() {
+  const emailToken = localStorage.getItem('Email_token')
+  const newPassword = await hashPassword(document.getElementById('new_password').value)
+
+  try {
+    fetch('http://localhost:4000/auth/reset_password', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ newPassword, emailToken }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          return Promise.reject('Request failed with status ' + response.status)
+        }
+        console.log('Status: ', response.status)
+        if (response.status === 200) {
+          showLogin()
+        }
+        return response.json()
+      })
+      .then((data) => {})
+      .catch((error) => console.error('Ошибка:', error))
+  } catch (error) {
+    console.log('Ошибка:', error)
+  }
 }
 
 async function hashPassword(password) {
