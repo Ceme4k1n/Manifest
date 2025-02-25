@@ -3,26 +3,39 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Регистрация</title>
+    <title>Авторизация</title>
     <link rel="stylesheet" href="styles.css" />
+    <style>
+      .hidden {
+        display: none;
+      }
+    </style>
   </head>
   <body>
-    <div class="container">
+    <!-- Контейнер для авторизации -->
+    <div class="container" id="loginContainer">
       <div class="card">
-        <h2>Авторизоваться</h2>
+        <h2>Авторизация</h2>
         <form id="loginForm">
-          <label for="username">Email</label>
-          <input type="text" id="log_email" name="username" required />
+          <label for="log_email">Email</label>
+          <input type="email" id="log_email" name="username" required />
 
-          <label for="password">Пароль</label>
+          <label for="log_password">Пароль</label>
           <input type="password" id="log_password" name="password" required />
 
-          <button type="submit">Залогиниться</button>
+          <button type="submit">Войти</button>
+
+          <!-- Кнопки перехода -->
+          <div class="actions">
+            <p class="link-text"><a href="#" onclick="showReg()">Зарегистрироваться</a></p>
+            <p class="link-text"><a href="#" onclick="showForgotEmail()">Забыли пароль?</a></p>
+          </div>
         </form>
       </div>
     </div>
 
-    <div class="container">
+    <!-- Контейнер для регистрации -->
+    <div class="container" id="regContainer" style="display: none">
       <div class="card">
         <h2>Регистрация</h2>
         <form id="regForm">
@@ -32,16 +45,60 @@
           <label for="reg_lastname">Фамилия</label>
           <input type="text" id="reg_lastname" name="lastname" required />
 
-          <label for="email">Email</label>
-          <input type="text" id="reg_email" name="email" required />
+          <label for="reg_email">Email</label>
+          <input type="email" id="reg_email" name="email" required />
 
-          <label for="password">Пароль</label>
+          <label for="reg_password">Пароль</label>
           <input type="password" id="reg_password" name="password" required />
 
           <button type="submit">Зарегистрироваться</button>
+          <p class="link-text">Уже есть аккаунт? <a href="#" onclick="showLogin()">Войти</a></p>
         </form>
       </div>
     </div>
+
+    <!-- Контейнер для восстановления пароля (ШАГ 1 - Запрос почты) -->
+    <div class="container" id="forgotEmailContainer" style="display: none">
+      <div class="card">
+        <h2>Восстановление пароля</h2>
+        <form id="forgotEmailForm">
+          <label for="forgot_email">Email</label>
+          <input type="email" id="forgot_email" name="email" required />
+
+          <button type="button" onclick="sendEmail()">Отправить код</button>
+          <p class="link-text"><a href="#" onclick="showLogin()">Вернуться к входу</a></p>
+        </form>
+      </div>
+    </div>
+
+    <!-- Контейнер для ввода кода (ШАГ 2 - Проверка кода) -->
+    <div class="container" id="forgotCodeContainer" style="display: none">
+      <div class="card">
+        <h2>Введите код</h2>
+        <form id="forgotCodeForm">
+          <label for="forgot_code">Код из почты</label>
+          <input type="text" id="forgot_code" name="forgot_code" required />
+
+          <button type="button" onclick="verifyCode()">Проверить код</button>
+          <p class="link-text"><a href="#" onclick="showForgotEmail()">Назад</a></p>
+        </form>
+      </div>
+    </div>
+
+    <!-- Контейнер для смены пароля (ШАГ 3 - Новый пароль) -->
+    <div class="container" id="forgotPasswordContainer" style="display: none">
+      <div class="card">
+        <h2>Новый пароль</h2>
+        <form id="forgotPasswordForm">
+          <label for="new_password">Введите новый пароль</label>
+          <input type="password" id="new_password" name="new_password" required />
+
+          <button type="button" onclick="resetPassword()">Сменить пароль</button>
+          <p class="link-text"><a href="#" onclick="showLogin()">Вернуться к входу</a></p>
+        </form>
+      </div>
+    </div>
+
     <script src="script.js"></script>
   </body>
 </html>

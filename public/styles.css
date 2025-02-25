@@ -4,44 +4,44 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh;
   margin: 0;
 }
 
 .container {
   width: 100%;
   max-width: 400px;
+  transition: 0.3s all;
 }
 
 .card {
   background: #fff;
-  padding: 20px;
+  padding: 25px;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   text-align: center;
 }
 
 h2 {
-  margin-bottom: 20px;
+  margin-bottom: 25px;
   color: #333;
 }
 
 form {
   display: flex;
   flex-direction: column;
+  gap: 15px;
 }
 
 label {
   text-align: left;
-  margin: 5px 0;
   font-weight: bold;
   color: #555;
 }
 
 input {
-  padding: 10px;
-  margin-bottom: 15px;
-  border: 1px solid #ccc;
+  padding: 12px;
+  border: 1px solid #ddd;
   border-radius: 8px;
   font-size: 16px;
 }
@@ -49,7 +49,7 @@ input {
 button {
   background-color: #007bff;
   color: white;
-  padding: 12px;
+  padding: 14px;
   border: none;
   border-radius: 8px;
   font-size: 16px;
@@ -59,4 +59,28 @@ button {
 
 button:hover {
   background-color: #0056b3;
+}
+
+.actions {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.link-text {
+  font-size: 14px;
+}
+
+.link-text a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.link-text a:hover {
+  text-decoration: underline;
+}
+.hidden {
+  display: none;
 }

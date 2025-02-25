@@ -5,6 +5,37 @@ const regLastName = document.getElementById('reg_lastname')
 const regEmail = document.getElementById('reg_email')
 const regPassword = document.getElementById('reg_password')
 
+function showLogin() {
+  hideAll()
+  document.getElementById('loginContainer').style.display = 'block'
+}
+
+function showReg() {
+  hideAll()
+  document.getElementById('regContainer').style.display = 'block'
+}
+
+function showForgotEmail() {
+  hideAll()
+  document.getElementById('forgotEmailContainer').style.display = 'block'
+}
+
+function showForgotCode() {
+  hideAll()
+  document.getElementById('forgotCodeContainer').style.display = 'block'
+}
+
+function showForgotPassword() {
+  hideAll()
+  document.getElementById('forgotPasswordContainer').style.display = 'block'
+}
+
+// Функция скрывает все контейнеры перед показом нужного
+function hideAll() {
+  document.querySelectorAll('.container').forEach((container) => {
+    container.style.display = 'none'
+  })
+}
 document.addEventListener('DOMContentLoaded', function () {
   const token = localStorage.getItem('Token')
 
@@ -89,6 +120,66 @@ document.getElementById('regForm').addEventListener('submit', async function (ev
     console.log('Ошибка:', error)
   }
 })
+
+async function sendEmail() {
+  let emailCheck = document.getElementById('forgot_email').value
+  console.log(emailCheck)
+
+  try {
+    fetch('http://localhost:4000/auth/forgot_pass', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ emailCheck }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          return Promise.reject('Request failed with status ' + response.status)
+        }
+        console.log('Status: ', response.status)
+        if (response.status === 200) {
+          showForgotCode()
+        }
+        return response.json()
+      })
+      .then((data) => {
+        console.log(data.tokenEmail)
+        localStorage.setItem('Email_token', data.tokenEmail)
+      })
+      .catch((error) => console.error('Ошибка:', error))
+  } catch (error) {}
+}
+
+async function verifyCode() {
+  let code = document.getElementById('forgot_code').value
+  const emailToken = localStorage.getItem('Email_token')
+
+  try {
+    fetch('http://localhost:4000/auth/verefi_code', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ code, emailToken }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          return Promise.reject('Request failed with status ' + response.status)
+        }
+        console.log('Status: ', response.status)
+        if (response.status === 200) {
+          showForgotPassword()
+        }
+        return response.json()
+      })
+      .then((data) => {
+        console.log(data.tokenEmail)
+        localStorage.setItem('Email_token', data.tokenEmail)
+      })
+      .catch((error) => console.error('Ошибка:', error))
+  } catch (error) {}
+}
 
 async function hashPassword(password) {
   const encoder = new TextEncoder()

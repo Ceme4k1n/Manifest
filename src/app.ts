@@ -1,4 +1,4 @@
-import express, { Express, Request, Response } from 'express'
+import express from 'express'
 const dotenv = require('dotenv')
 dotenv.config()
 import authRouter from './routes/auth'

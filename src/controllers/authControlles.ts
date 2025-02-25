@@ -3,6 +3,8 @@ const dotenv = require('dotenv')
 import jwt from 'jsonwebtoken'
 dotenv.config()
 import db from '../database/db'
+import { log } from 'node:console'
+import { randomInt, sign } from 'node:crypto'
 
 const SECRET_KEY = process.env.SECRET_KEY || 'test'
 
@@ -44,6 +46,8 @@ export const user_register = async (req: Request, res: Response) => {
         console.log(futureId)
 
         await db.none('INSERT INTO man.users(username, email, password_hash, fio) VALUES($1, $2, $3, $4)', [futureId, email, password, fio])
+        const token = jwt.sign({ name: email }, SECRET_KEY, { expiresIn: '5s' })
+        res.status(200).json({ message: 'Рега успешная', token })
       }
     } catch (error) {
       console.error(error)
@@ -67,4 +71,65 @@ export const user_check_token = (req: Request, res: Response) => {
     }
     res.status(200).json({ message: 'Protected data accessed!', user: decoded })
   })
+}
+
+export const email_restore = async (req: Request, res: Response) => {
+  const { emailCheck } = req.body
+
+  try {
+    const user = await db.any('SELECT username FROM man.users WHERE email = $1', [emailCheck])
+    if (user.length <= 0) {
+      console.log('Такого пользователя нет')
+      res.status(403).json({ message: 'Email not exist' })
+      return
+    }
+    console.log(user[0].username)
+    const resetCode = randomInt(100000, 999999)
+    console.log(resetCode)
+    await db.none('UPDATE man.users SET reset_code = $1 WHERE email = $2', [resetCode, emailCheck])
+    const tokenEmail = jwt.sign({ Email: emailCheck }, SECRET_KEY, { expiresIn: '10m' })
+    res.status(200).json({ message: 'Email exist', tokenEmail })
+  } catch (error) {
+    console.error(error)
+    res.status(501).json({ error: 'Database error' })
+  }
+}
+
+export const verefi_code = async (req: Request, res: Response) => {
+  const { code, emailToken } = req.body
+  let decodeEmail
+  if (!code || !emailToken) {
+    res.status(402).json({ message: 'Code or token not exits' })
+    return
+  }
+  console.log(code, emailToken)
+  jwt.verify(emailToken, SECRET_KEY, (err: any, decoded: any) => {
+    if (err) {
+      res.status(403).json({ message: 'Invalid token' })
+      return
+    }
+    console.log('Email: ', decoded.Email)
+    decodeEmail = decoded.Email
+  })
+  try {
+    const result = await db.one('select count(*) <> 0 as exists from man.users where email = $1 and reset_code = $2', [decodeEmail, code])
+    if (result.exists) {
+      const tokenEmail = jwt.sign({ Email: decodeEmail, Code: code }, SECRET_KEY, { expiresIn: '10m' })
+      res.status(200).json({ message: 'Email exist', tokenEmail })
+      res.status(200).json('True user')
+    }
+  } catch (error) {
+    console.error(error)
+    res.status(501).json({ error: 'Database error' })
+  }
+}
+
+export const reset_password = async (req: Request, res: Response) => {
+  const { newPassword } = req.body
+  let decodeEmail
+
+  console.log(newPassword)
+
+  try {
+  } catch (error) {}
 }
