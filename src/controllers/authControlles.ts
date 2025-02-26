@@ -1,4 +1,6 @@
 import express, { Express, Request, Response } from 'express'
+import Redis from 'ioredis'
+const redis = new Redis()
 const dotenv = require('dotenv')
 import jwt from 'jsonwebtoken'
 dotenv.config()
@@ -40,14 +42,21 @@ export const user_register = async (req: Request, res: Response) => {
         console.log('Юзер существует: ', user)
         return
       } else {
-        const fio: string = name + ' ' + lastName
-        let result = await db.one('SELECT MAX(id) FROM man.users')
-        const futureId = 'id_' + (result.max + 1)
-        console.log(futureId)
-
-        await db.none('INSERT INTO man.users(username, email, password_hash, fio) VALUES($1, $2, $3, $4)', [futureId, email, password, fio])
-        const token = jwt.sign({ name: email }, SECRET_KEY, { expiresIn: '5s' })
-        res.status(200).json({ message: 'Рега успешная', token })
+        const reg_token = jwt.sign({ Email: email }, SECRET_KEY, { expiresIn: '10m' })
+        const code = randomInt(100000, 999999)
+        await redis.hset(`email_ver:${email}`, {
+          redName: name,
+          redLastName: lastName,
+          redPass: password,
+          redCode: code,
+        })
+        console.log('Код для редиса:', code)
+        res.status(200).json({ reg_token })
+        // const fio: string = name + ' ' + lastName
+        // let result = await db.one('SELECT MAX(id) FROM man.users')
+        // const futureId = 'id_' + (result.max + 1)
+        // console.log(futureId)
+        //await db.none('INSERT INTO man.users(username, email, password_hash, fio) VALUES($1, $2, $3, $4)', [futureId, email, password, fio])
       }
     } catch (error) {
       console.error(error)
@@ -146,4 +155,33 @@ export const reset_password = async (req: Request, res: Response) => {
     console.error(error)
     res.status(501).json({ error: 'Database error' })
   }
+}
+
+export const verefiEmailCode = async (req: Request, res: Response) => {
+  const { reg_token, code } = req.body
+  let email
+  if (!reg_token || !code) {
+    res.status(403).json()
+    return
+  }
+
+  jwt.verify(reg_token, SECRET_KEY, (err: any, decoded: any) => {
+    if (err) {
+      res.status(403).json({ message: 'Invalid token' })
+      return
+    }
+    email = decoded.Email
+  })
+  console.log(email)
+
+  res.status(200).json()
+
+  // const redisCode = await redis.get(`email_ver:${email}`)
+  // if (redisCode && redisCode === code) {
+  //   await redis.del(`email_ver:${email}`)
+  //   res.status(200).json({ message: 'Redis code correct' })
+  // } else {
+  //   res.status(403).json()
+  //   return
+  // }
 }

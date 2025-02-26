@@ -1,5 +1,5 @@
 import express, { Express, Request, Response } from 'express'
-import { user_login, user_register, user_check_token, email_restore, verefi_code, reset_password } from '../controllers/authControlles'
+import { user_login, user_register, user_check_token, email_restore, verefi_code, reset_password, verefiEmailCode } from '../controllers/authControlles'
 
 const router = express.Router()
 
@@ -9,4 +9,5 @@ router.get('/protect', user_check_token)
 router.post('/forgot_pass', email_restore)
 router.post('/verefi_code', verefi_code)
 router.post('/reset_password', reset_password)
+router.post('/reg_verefi', verefiEmailCode)
 export default router

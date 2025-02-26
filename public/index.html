@@ -57,6 +57,20 @@
       </div>
     </div>
 
+    <!-- Контейнер для регистрации с кодом -->
+    <div class="container" id="regCodeContainer" style="display: none">
+      <div class="card">
+        <h2>Регистрация с кодом</h2>
+        <form id="regCodeForm">
+          <label for="reg_code">Код</label>
+          <input type="text" id="reg_code" name="code" required />
+
+          <button type="submit">Подтвердить</button>
+          <p class="link-text"><a href="#" onclick="showLogin()">Вернуться к входу</a></p>
+        </form>
+      </div>
+    </div>
+
     <!-- Контейнер для восстановления пароля (ШАГ 1 - Запрос почты) -->
     <div class="container" id="forgotEmailContainer" style="display: none">
       <div class="card">

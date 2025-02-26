@@ -30,6 +30,10 @@ function showForgotPassword() {
   document.getElementById('forgotPasswordContainer').style.display = 'block'
 }
 
+function showRegCode() {
+  hideAll()
+  document.getElementById('regCodeContainer').style.display = 'block'
+}
 // Функция скрывает все контейнеры перед показом нужного
 function hideAll() {
   document.querySelectorAll('.container').forEach((container) => {
@@ -38,7 +42,6 @@ function hideAll() {
 }
 document.addEventListener('DOMContentLoaded', function () {
   const token = localStorage.getItem('Token')
-
   if (!token) {
     return
   }
@@ -106,15 +109,50 @@ document.getElementById('regForm').addEventListener('submit', async function (ev
         if (!response.ok) {
           return Promise.reject('Request failed with status ' + response.status)
         }
+        if (response.status === 200) {
+          showRegCode()
+        }
         return response.json()
       })
       .then((data) => {
         if (data) {
-          console.log(data.token)
-          localStorage.setItem('Token', data.token)
-          window.location.href = '/profile.html'
+          localStorage.setItem('Reg_Token', data.reg_token)
         }
       })
+      .catch((error) => console.log('Error:', error))
+  } catch (error) {
+    console.log('Ошибка:', error)
+  }
+})
+
+document.getElementById('regCodeForm').addEventListener('submit', async function (event) {
+  event.preventDefault()
+
+  const reg_token = localStorage.getItem('Reg_Token')
+  const code = document.getElementById('reg_code').value
+  if (!reg_token || !code) {
+    return
+  }
+
+  try {
+    fetch('http://localhost:4000/auth/reg_verefi', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ reg_token, code }),
+    })
+      .then((response) => {
+        console.log('Status: ', response.status)
+
+        if (!response.ok) {
+          return Promise.reject('Request failed with status ' + response.status)
+        }
+        if (response.status === 200) {
+        }
+        return response.json()
+      })
+      .then((data) => {})
       .catch((error) => console.log('Error:', error))
   } catch (error) {
     console.log('Ошибка:', error)
@@ -210,6 +248,10 @@ async function resetPassword() {
   } catch (error) {
     console.log('Ошибка:', error)
   }
+}
+
+async function regVerefiCode() {
+  const emailRegToken = localStorage.getItem('')
 }
 
 async function hashPassword(password) {
