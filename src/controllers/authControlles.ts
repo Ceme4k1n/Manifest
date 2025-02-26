@@ -7,6 +7,7 @@ dotenv.config()
 import db from '../database/db'
 import { log } from 'node:console'
 import { randomInt, sign } from 'node:crypto'
+import { RedisSearchLanguages } from 'redis'
 
 const SECRET_KEY = process.env.SECRET_KEY || 'test'
 
@@ -50,13 +51,10 @@ export const user_register = async (req: Request, res: Response) => {
           redPass: password,
           redCode: code,
         })
+        await redis.expire(`email_ver:${email}`, 900)
+
         console.log('Код для редиса:', code)
         res.status(200).json({ reg_token })
-        // const fio: string = name + ' ' + lastName
-        // let result = await db.one('SELECT MAX(id) FROM man.users')
-        // const futureId = 'id_' + (result.max + 1)
-        // console.log(futureId)
-        //await db.none('INSERT INTO man.users(username, email, password_hash, fio) VALUES($1, $2, $3, $4)', [futureId, email, password, fio])
       }
     } catch (error) {
       console.error(error)
@@ -172,16 +170,21 @@ export const verefiEmailCode = async (req: Request, res: Response) => {
     }
     email = decoded.Email
   })
-  console.log(email)
 
-  res.status(200).json()
-
-  // const redisCode = await redis.get(`email_ver:${email}`)
-  // if (redisCode && redisCode === code) {
-  //   await redis.del(`email_ver:${email}`)
-  //   res.status(200).json({ message: 'Redis code correct' })
-  // } else {
-  //   res.status(403).json()
-  //   return
-  // }
+  const user = await redis.hgetall(`email_ver:${email}`)
+  if (code === user.redCode) {
+    res.status(200).json({ message: 'Accept reg' })
+    try {
+      const fio: string = user.redName + ' ' + user.redLastName
+      let result = await db.one('SELECT MAX(id) FROM man.users')
+      const futureId = 'id_' + (result.max + 1)
+      await db.none('INSERT INTO man.users(username, email, password_hash, fio) VALUES($1, $2, $3, $4)', [futureId, email, user.redPass, fio])
+    } catch (error) {
+      console.error(error)
+      res.status(501).json({ error: 'Database error' })
+    }
+  } else {
+    res.status(403).json({ message: 'Invalid code' })
+    return
+  }
 }
