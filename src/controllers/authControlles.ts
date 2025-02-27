@@ -1,13 +1,11 @@
-import express, { Express, Request, Response } from 'express'
+import { Request, Response } from 'express'
 import Redis from 'ioredis'
 const redis = new Redis()
 const dotenv = require('dotenv')
 import jwt from 'jsonwebtoken'
 dotenv.config()
 import db from '../database/db'
-import { log } from 'node:console'
-import { randomInt, sign } from 'node:crypto'
-import { RedisSearchLanguages } from 'redis'
+import { randomInt } from 'node:crypto'
 
 const SECRET_KEY = process.env.SECRET_KEY || 'test'
 

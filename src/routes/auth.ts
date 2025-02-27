@@ -1,4 +1,4 @@
-import express, { Express, Request, Response } from 'express'
+import express from 'express'
 import { user_login, user_register, user_check_token, email_restore, verefi_code, reset_password, verefiEmailCode } from '../controllers/authControlles'
 
 const router = express.Router()

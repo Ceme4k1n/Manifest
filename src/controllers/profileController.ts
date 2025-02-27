@@ -1,4 +1,4 @@
-import express, { Express, Request, Response } from 'express'
+import { Request, Response } from 'express'
 const dotenv = require('dotenv')
 import jwt from 'jsonwebtoken'
 dotenv.config()
