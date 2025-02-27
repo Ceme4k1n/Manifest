@@ -173,12 +173,13 @@ export const verefiEmailCode = async (req: Request, res: Response) => {
 
   const user = await redis.hgetall(`email_ver:${email}`)
   if (code === user.redCode) {
-    res.status(200).json({ message: 'Accept reg' })
     try {
       const fio: string = user.redName + ' ' + user.redLastName
       let result = await db.one('SELECT MAX(id) FROM man.users')
       const futureId = 'id_' + (result.max + 1)
       await db.none('INSERT INTO man.users(username, email, password_hash, fio) VALUES($1, $2, $3, $4)', [futureId, email, user.redPass, fio])
+      await redis.del(`email_ver:${email}`)
+      res.status(200).json({ message: 'Accept reg' })
     } catch (error) {
       console.error(error)
       res.status(501).json({ error: 'Database error' })
